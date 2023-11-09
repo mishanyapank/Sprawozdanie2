@@ -1,0 +1,120 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import convolve
+
+def h1(x):
+    return np.where((x >= 0) & (x < 1), 1.0, 0.0)
+
+def h2(x):
+    return np.where((x >= -0.5) & (x < 0.5), 1.0, 0.0)
+
+def h3(x):
+    return np.where((np.abs(x) <= 1), 1.0 - np.abs(x), 0.0)
+
+N = 100
+
+#funkcja sin(x) (1)
+
+x_min1 = -np.pi
+x_max1 = np.pi
+
+x1 = np.linspace(x_min1, x_max1, N)
+
+y1 = np.sin(x1)
+
+interpolated11 = convolve(y1, h1(x1), mode='same', method='direct')
+interpolated21 = convolve(y1, h2(x1), mode='same', method='direct')
+interpolated31 = convolve(y1, h3(x1), mode='same', method='direct')
+
+interpolated11 /= np.sum(h1(x1))
+interpolated21 /= np.sum(h2(x1))
+interpolated31 /= np.sum(h3(x1))
+
+mse11 = np.mean((y1 - interpolated11) ** 2)
+mse21 = np.mean((y1 - interpolated21) ** 2)
+mse31 = np.mean((y1 - interpolated31) ** 2)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x1, y1, label='Funkcja sin(x)', color='blue')
+plt.plot(x1, interpolated11, label='Interpolacja 1', color='green')
+plt.plot(x1, interpolated21, label='Interpolacja 2', color='red')
+plt.plot(x1, interpolated31, label='Interpolacja 3', color='purple')
+plt.legend()
+plt.title('Interpolacja za pomocą różnych jąder konwolucji')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+print(f'MSE dla interpolacji h1 funkcji sin(x): {mse11}')
+print(f'MSE dla interpolacji h2 funkcji sin(x): {mse21}')
+print(f'MSE dla interpolacji h3 funkcji sin(x): {mse31}')
+
+#funkcja sin(1/x) (2)
+
+x_min2 = 0.01  # Zakres musi rozpoczynać się od wartości większych niż 0
+x_max2 = np.pi
+
+x2 = np.linspace(x_min2, x_max2, N)
+y2 = np.sin(1 / x2)
+
+interpolated12 = convolve(y2, h1(x2), mode='same', method='direct')
+interpolated22 = convolve(y2, h2(x2), mode='same', method='direct')
+interpolated32 = convolve(y2, h3(x2), mode='same', method='direct')
+
+interpolated12 /= np.sum(h1(x2))
+interpolated22 /= np.sum(h2(x2))
+interpolated32 /= np.sum(h3(x2))
+
+mse12 = np.mean((y2 - interpolated12) ** 2)
+mse22 = np.mean((y2 - interpolated22) ** 2)
+mse32 = np.mean((y2 - interpolated32) ** 2)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x2, y2, label='Funkcja sin(1/x)', color='blue')
+plt.plot(x2, interpolated12, label='Interpolacja 1', color='green')
+plt.plot(x2, interpolated22, label='Interpolacja 2', color='red')
+plt.plot(x2, interpolated32, label='Interpolacja 3', color='purple')
+plt.legend()
+plt.title('Interpolacja sin(1/x) za pomocą różnych jąder konwolucji')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+print(f'MSE dla interpolacji h1 funkcji sin(1/x): {mse12}')
+print(f'MSE dla interpolacji h2 funkcji sin(1/x): {mse22}')
+print(f'MSE dla interpolacji h3 funkcji sin(1/x): {mse32}')
+
+#funkcja sgn(sin(8x)) (3)
+
+x_min3 = 0.01  # Zakres musi rozpoczynać się od wartości większych niż 0
+x_max3 = np.pi
+
+x_f3 = np.linspace(x_min3, x_max3, N)
+f3 = np.sign(np.sin(8 * x_f3))
+
+interpolated1_f3 = convolve(f3, h1(x_f3), mode='same', method='direct')
+interpolated2_f3 = convolve(f3, h2(x_f3), mode='same', method='direct')
+interpolated3_f3 = convolve(f3, h3(x_f3), mode='same', method='direct')
+
+interpolated1_f3 /= np.sum(h1(x_f3))
+interpolated2_f3 /= np.sum(h2(x_f3))
+interpolated3_f3 /= np.sum(h3(x_f3))
+
+mse1_f3 = np.mean((f3 - interpolated1_f3) ** 2)
+mse2_f3 = np.mean((f3 - interpolated2_f3) ** 2)
+mse3_f3 = np.mean((f3 - interpolated3_f3) ** 2)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x_f3, f3, label='Oryginalna funkcja', color='blue')
+plt.plot(x_f3, interpolated1_f3, label='Interpolacja 1', color='green')
+plt.plot(x_f3, interpolated2_f3, label='Interpolacja 2', color='red')
+plt.plot(x_f3, interpolated3_f3, label='Interpolacja 3', color='purple')
+plt.legend()
+plt.title('Interpolacja sgn(sin(8x)) za pomocą różnych jąder konwolucji')
+plt.xlabel('x_f3')
+plt.ylabel('f3')
+plt.show()
+
+print(f'MSE dla interpolacji h1 funkcji sgn(sin(8x)): {mse1_f3}')
+print(f'MSE dla interpolacji h2 funkcji sgn(sin(8x)): {mse2_f3}')
+print(f'MSE dla interpolacji h3 funkcji sgn(sin(8x)): {mse3_f3}')
