@@ -1,0 +1,33 @@
+import cv2
+import numpy as np
+
+original_image = cv2.imread('obraz.jpg', cv2.IMREAD_GRAYSCALE)
+
+downscale_factor = 2  # Przykład 2x zmniejszenia
+upscale_factor = 2    # Przykład 2x powiększenia
+
+# Operacja zmniejszania 
+downscaled_image = cv2.resize(original_image, None, fx=1/downscale_factor, fy=1/downscale_factor, interpolation=cv2.INTER_LINEAR)
+
+# Operacja powiększania 
+upscaled_image = cv2.resize(original_image, None, fx=upscale_factor, fy=upscale_factor, interpolation=cv2.INTER_LINEAR)
+
+if original_image.shape != downscaled_image.shape:
+    downscaled_image = cv2.resize(downscaled_image, original_image.shape[::-1], interpolation=cv2.INTER_LINEAR)
+
+if original_image.shape != upscaled_image.shape:
+    upscaled_image = cv2.resize(upscaled_image, original_image.shape[::-1], interpolation=cv2.INTER_LINEAR)
+
+# MSE
+mse_downscaled = np.mean((original_image - downscaled_image) ** 2)
+mse_upscaled = np.mean((original_image - upscaled_image) ** 2)
+
+cv2.imshow('Oryginalny obraz', original_image)
+cv2.imshow('Zmniejszony obraz', downscaled_image)
+cv2.imshow('Powiększony obraz', upscaled_image)
+
+print(f'MSE po zmniejszeniu: {mse_downscaled:.2f}')
+print(f'MSE po powiększeniu: {mse_upscaled:.2f}')
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
