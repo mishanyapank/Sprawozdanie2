@@ -1,0 +1,36 @@
+import cv2
+import numpy as np
+
+def downsampling_convolution(image, scale_factor):
+    kernel_size = int(1 / scale_factor)
+    if kernel_size % 2 == 0:
+        kernel_size += 1  # Upewniamy się, że rozmiar kernela jest nieparzysty
+    kernel = np.ones((kernel_size, kernel_size), np.float32) / (kernel_size ** 2)
+    result = cv2.filter2D(image, -1, kernel, borderType=cv2.BORDER_CONSTANT)
+    return result
+
+original_image = cv2.imread('obraz.jpg', cv2.IMREAD_GRAYSCALE)
+downscale_factor = 2
+
+# Operacja zmniejszania za pomocą konwolucji 2D
+downscaled_image_conv = downsampling_convolution(original_image, downscale_factor)
+
+# Operacja powiększania
+upscaled_image = cv2.resize(downscaled_image_conv, None, fx=downscale_factor, fy=downscale_factor, interpolation=cv2.INTER_LINEAR)
+
+if original_image.shape != upscaled_image.shape:
+    upscaled_image = cv2.resize(upscaled_image, original_image.shape[::-1], interpolation=cv2.INTER_LINEAR)
+
+# MSE
+mse_downscaled_conv = np.mean((original_image - downscaled_image_conv) ** 2)
+mse_upscaled = np.mean((original_image - upscaled_image) ** 2)
+
+cv2.imshow('Oryginalny obraz', original_image)
+cv2.imshow('Zmniejszony obraz (konwolucja)', downscaled_image_conv.astype(np.uint8))
+cv2.imshow('Powiększony obraz', upscaled_image)
+
+print(f'MSE po zmniejszeniu (konwolucja): {mse_downscaled_conv:.2f}')
+print(f'MSE po powiększeniu: {mse_upscaled:.2f}')
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
