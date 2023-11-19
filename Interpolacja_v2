@@ -1,0 +1,123 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def h1(x, sigma=0.1):
+    return np.exp(-x**2 / (2 * sigma**2))
+
+def h2(x, sigma=0.1):
+    return np.exp(-x**2 / (2 * sigma**2))
+
+def h3(x, sigma=0.1):
+    return np.exp(-np.abs(x) / sigma)
+
+def interpolate(x, y, kernel, sigma):
+    N = len(x)
+    interpolated = np.zeros(N)
+
+    for i in range(N):
+        kernel_values = kernel(x - x[i], sigma)
+        interpolated[i] = np.sum(y * kernel_values) / np.sum(kernel_values)
+
+    mse = np.mean((y - interpolated) ** 2)
+
+    return interpolated, mse
+
+N = 100
+
+# Funkcja sin(x) (1)
+x_min1 = -np.pi
+x_max1 = np.pi
+x1 = np.linspace(x_min1, x_max1, N)
+y1 = np.sin(x1)
+
+# Funkcja sin(1/x) (2)
+x_min2 = 0.01
+x_max2 = np.pi
+x2 = np.linspace(x_min2, x_max2, N)
+y2 = np.sin(1 / x2)
+
+# Funkcja sgn(sin(8x)) (3)
+x_min3 = 0.01
+x_max3 = np.pi
+x_f3 = np.linspace(x_min3, x_max3, N)
+f3 = np.sign(np.sin(8 * x_f3))
+
+sigma = 0.1
+
+# Funkcja sin(x) (1) z funkcją jądrową h1
+interpolated1_h1, mse1_h1 = interpolate(x1, y1, h1, sigma)
+
+# Funkcja sin(x) (1) z funkcją jądrową h2
+interpolated1_h2, mse1_h2 = interpolate(x1, y1, h2, sigma)
+
+# Funkcja sin(x) (1) z funkcją jądrową h3
+interpolated1_h3, mse1_h3 = interpolate(x1, y1, h3, sigma)
+
+# Funkcja sin(1/x) (2) z funkcją jądrową h1
+interpolated2_h1, mse2_h1 = interpolate(x2, y2, h1, sigma)
+
+# Funkcja sin(1/x) (2) z funkcją jądrową h2
+interpolated2_h2, mse2_h2 = interpolate(x2, y2, h2, sigma)
+
+# Funkcja sin(1/x) (2) z funkcją jądrową h3
+interpolated2_h3, mse2_h3 = interpolate(x2, y2, h3, sigma)
+
+# Funkcja sgn(sin(8x)) (3) z funkcją jądrową h1
+interpolated3_h1, mse3_h1 = interpolate(x_f3, f3, h1, sigma)
+
+# Funkcja sgn(sin(8x)) (3) z funkcją jądrową h2
+interpolated3_h2, mse3_h2 = interpolate(x_f3, f3, h2, sigma)
+
+# Funkcja sgn(sin(8x)) (3) z funkcją jądrową h3
+interpolated3_h3, mse3_h3 = interpolate(x_f3, f3, h3, sigma)
+
+# Plot i wyniki dla funkcji sin(x)
+plt.figure(figsize=(15, 10))
+plt.plot(x1, y1, label='Funkcja sin(x)', color='blue')
+plt.plot(x1, interpolated1_h1, label=f'Interpolacja h1', linestyle='dashed')
+plt.plot(x1, interpolated1_h2, label=f'Interpolacja h2', linestyle='dashed')
+plt.plot(x1, interpolated1_h3, label=f'Interpolacja h3', linestyle='dashed')
+plt.legend()
+plt.title('Interpolacja za pomocą różnych funkcji jądrowych dla sin(x)')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+# MSE dla interpolacji h1, h2, h3 dla sin(x)
+print(f'MSE dla interpolacji h1 funkcji sin(x): {mse1_h1}')
+print(f'MSE dla interpolacji h2 funkcji sin(x): {mse1_h2}')
+print(f'MSE dla interpolacji h3 funkcji sin(x): {mse1_h3}')
+
+# Plot i wyniki dla funkcji sin(1/x)
+plt.figure(figsize=(15, 10))
+plt.plot(x2, y2, label='Funkcja sin(1/x)', color='blue')
+plt.plot(x2, interpolated2_h1, label=f'Interpolacja h1', linestyle='dashed')
+plt.plot(x2, interpolated2_h2, label=f'Interpolacja h2', linestyle='dashed')
+plt.plot(x2, interpolated2_h3, label=f'Interpolacja h3', linestyle='dashed')
+plt.legend()
+plt.title('Interpolacja za pomocą różnych funkcji jądrowych dla sin(1/x)')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+# MSE dla interpolacji h1, h2, h3 dla sin(1/x)
+print(f'MSE dla interpolacji h1 funkcji sin(1/x): {mse2_h1}')
+print(f'MSE dla interpolacji h2 funkcji sin(1/x): {mse2_h2}')
+print(f'MSE dla interpolacji h3 funkcji sin(1/x): {mse2_h3}')
+
+# Plot i wyniki dla funkcji sgn(sin(8x))
+plt.figure(figsize=(15, 10))
+plt.plot(x_f3, f3, label='Funkcja sgn(sin(8x))', color='blue')
+plt.plot(x_f3, interpolated3_h1, label=f'Interpolacja h1', linestyle='dashed')
+plt.plot(x_f3, interpolated3_h2, label=f'Interpolacja h2', linestyle='dashed')
+plt.plot(x_f3, interpolated3_h3, label=f'Interpolacja h3', linestyle='dashed')
+plt.legend()
+plt.title('Interpolacja za pomocą różnych funkcji jądrowych dla sgn(sin(8x))')
+plt.xlabel('x_f3')
+plt.ylabel('f3')
+plt.show()
+
+# MSE dla interpolacji h1, h2, h3 dla sgn(sin(8x))
+print(f'MSE dla interpolacji h1 funkcji sgn(sin(8x)): {mse3_h1}')
+print(f'MSE dla interpolacji h2 funkcji sgn(sin(8x)): {mse3_h2}')
+print(f'MSE dla interpolacji h3 funkcji sgn(sin(8x)): {mse3_h3}')
